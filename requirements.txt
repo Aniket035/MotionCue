@@ -1,0 +1,7 @@
+cvzone
+mediapipe
+streamlit
+streamlit-lottie
+simplejson
+opencv-python
+opencv-python-headless
