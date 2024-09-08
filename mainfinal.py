@@ -117,7 +117,7 @@ def recognize_gestures(folder_path, start_detection):
         h, w, _ = img_current.shape
         img_current[0:120, w - 213:w] = img_small
 
-        st.image(img_current, channels="BGR")
+        st.image("Slides", img_current)
         key = cv2.waitKey(1)
         if key == ord('q'):
             break
