@@ -50,7 +50,7 @@ def recognize_gestures(folder_path, start_detection):
         hands, img = detector.findHands(img)
         cv2.line(img, (0, gesture_threshold), (width, gesture_threshold), (0, 255, 0), 10)
 
-        if hands and button_pressed is False:
+        if hands and not button_pressed:
             hand = hands[0]
             fingers = detector.fingersUp(hand)
             cx, cy = hand['center']
@@ -84,7 +84,7 @@ def recognize_gestures(folder_path, start_detection):
                 annotation_start = False
 
             if fingers == [0, 1, 0, 0, 0]:  # Gesture 4- draw Pointer
-                if annotation_start is False:
+                if not annotation_start:
                     annotation_start = True
                     annotation_number += 1
                     annotations.append([])
@@ -117,14 +117,17 @@ def recognize_gestures(folder_path, start_detection):
         h, w, _ = img_current.shape
         img_current[0:120, w - 213:w] = img_small
 
-        st.image("Slides", img_current)
+        st.image(img_current, channels="BGR")
         key = cv2.waitKey(1)
         if key == ord('q'):
             break
 
-        # Add a delay between frame updates
-        # time.sleep(10)  # Increase the delay to 5 seconds
+    cap.release()
+    cv2.destroyAllWindows()
 
+    # Cleanup images after processing
+    for image_file in os.listdir(folder_path):
+        os.remove(os.path.join(folder_path, image_file))
 
 # Function to save uploaded file
 def save_uploaded_file(uploaded_file):
@@ -135,13 +138,10 @@ def save_uploaded_file(uploaded_file):
             f.write(uploaded_file.getbuffer())
         return 1, destination_path
     except Exception as e:
-        # print(e)
         return 0, None
-
 
 # Streamlit UI
 def main():
-    
     im = "favicon/logo only mc.png"
     st.set_page_config(
         page_title="Motion-Cue",
@@ -150,7 +150,6 @@ def main():
         initial_sidebar_state="expanded",
     )
 
-    # st.title("Motion Cue")
     # Add HTML code with inline CSS to change font size
     st.markdown("""
         <div style='font-size: 144px;font-align: center;
@@ -163,12 +162,11 @@ def main():
     """, unsafe_allow_html=True)
 
     st.markdown("""
-            <div style='font-size: 50px;font-align: center;
-        font-family: comic sans ms, cursive; 
+        <div style='font-size: 50px;font-align: center;
+    font-family: comic sans ms, cursive; 
     margin-left: 292px;
-        justify-content: center; color: rgb(0, 0, 0);'>Please Upload Your Presentation</div>
-        """, unsafe_allow_html=True)
-    # st.header("Gesture Based Navigation")
+    justify-content: center; color: rgb(0, 0, 0);'>Please Upload Your Presentation</div>
+    """, unsafe_allow_html=True)
 
     lottie_upload = load_lottiefile("lottifilesjson/lottifilesjson/upload.json")
     st_lottie(lottie_upload, height=200, key="upload")
@@ -196,8 +194,5 @@ def main():
 
     recognize_gestures(folder_path, start_detection)
 
-
 if __name__ == "__main__":
     main()
-
-
